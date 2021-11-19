@@ -116,6 +116,8 @@
 <link rel='manifest' href='index.manifest.json'>
 <script type='application/javascript'>window.addEventListener('load', () => {if ('serviceWorker' in navigator) {navigator.serviceWorker.register('index.service.worker.js');}});</script>
 <script src="jquery.min.js" crossorigin="anonymous"></script>
+<script src="AgoraRTC.js" crossorigin="anonymous"></script>
+<script src="video.js" crossorigin="anonymous"></script>
 <script type="text/javascript" src="wallet.js" nonce crossorigin></script>
 </head>
 <body>
@@ -124,12 +126,7 @@
 		Please try updating or use a different browser.
 	</canvas>
 	<div id='status'>
-		<div id='status-progress' style='display: none;' oncontextmenu='event.preventDefault();'>
-			<div id ='status-progress-inner'>
-				<p style="color: white;">HashWorld Engine Initializing...</p>
-				<img src="tvrobot2.gif" width="100">
-			</div>
-		</div>
+		<div id='status-progress' style='display: none;' oncontextmenu='event.preventDefault();'><div id ='status-progress-inner'></div></div>
 		<div id='status-indeterminate' style='display: none;' oncontextmenu='event.preventDefault();'>
 			<div></div>
 			<div></div>
@@ -146,7 +143,7 @@
 	<script type='text/javascript' src='index.js'></script>
 	<script type='text/javascript'>//<![CDATA[
 
-		const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":14700144,"index.wasm":13360598},"focusCanvas":true,"gdnativeLibs":[]};
+		const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"executable":"index","experimentalVK":false,"fileSizes":{"index.pck":14933616,"index.wasm":13360598},"focusCanvas":true,"gdnativeLibs":[]};
 		var engine = new Engine(GODOT_CONFIG);
 
 		(function() {

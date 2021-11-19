@@ -69408,7 +69408,7 @@ var contractsInstance = {};
 var contractABI = {};
 var RarityAddress = "0xce761D788DF608BD21bdd59d6f4B54b2e27F25Bb"
 var rarityInfo = {};
-var defaultAccount;
+
 var printLog = true
 
 const JS_INFO_TYPE = {
@@ -69504,7 +69504,6 @@ App = {
                 // Handle the new accounts, or lack thereof.
                 // "accounts" will always be an array, but it can be empty.
                 if (printLog) console.log("accountsChanged");
-                if(defaultAccount)
                 window.location.reload();
             });
 
@@ -69513,7 +69512,6 @@ App = {
                 // Correctly handling chain changes can be complicated.
                 // We recommend reloading the page unless you have a very good reason not to.
                 if (printLog) console.log("chainChanged");
-                if(defaultAccount)
                 window.location.reload();
             });
             if (printLog) console.log("chainid=" + window.ethereum.chainId);
