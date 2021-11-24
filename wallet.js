@@ -69408,7 +69408,7 @@ var contractsInstance = {};
 var contractABI = {};
 var RarityAddress = "0xce761D788DF608BD21bdd59d6f4B54b2e27F25Bb"
 var rarityInfo = {};
-
+var defaultAccount;
 var printLog = true
 
 const JS_INFO_TYPE = {
@@ -69441,7 +69441,7 @@ App = {
         }
     },
     sign(msg) {
-        //'Login HashLand with Metamask'
+        //'Login HashWorld with Metamask'
         if(printLog)console.log("sign:"+msg)
         if (typeof window.ethereum == 'undefined' || !web3) {
             return
@@ -69503,16 +69503,16 @@ App = {
             window.ethereum.on('accountsChanged', (accounts) => {
                 // Handle the new accounts, or lack thereof.
                 // "accounts" will always be an array, but it can be empty.
-                if (printLog) console.log("accountsChanged");
-                window.location.reload();
+                if (printLog) console.log("accountsChanged "+defaultAccount);
+                if(defaultAccount) window.location.reload();
             });
 
             window.ethereum.on('chainChanged', (chainId) => {
                 // Handle the new chain.
                 // Correctly handling chain changes can be complicated.
                 // We recommend reloading the page unless you have a very good reason not to.
-                if (printLog) console.log("chainChanged");
-                window.location.reload();
+                if (printLog) console.log("chainChanged "+defaultAccount);
+                if(defaultAccount) window.location.reload();
             });
             if (printLog) console.log("chainid=" + window.ethereum.chainId);
             var chainId = window.ethereum.chainId;
@@ -69546,9 +69546,6 @@ App = {
             account:defaultAccount,
             chainid:window.ethereum.chainId
         })
-        // var address = defaultAccount.substring(0,7)+"..."+defaultAccount.substring(defaultAccount.length-5,defaultAccount.length-1);
-        // $("#walletaddress").text(address);
-        // return App.initContract();
     },
     initRarityContract(abi){
         contractABI['rarity'] = abi;
