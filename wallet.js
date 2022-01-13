@@ -69411,7 +69411,7 @@ var contractABI = {};
 var RarityAddress = "0xce761D788DF608BD21bdd59d6f4B54b2e27F25Bb"
 var rarityInfo = {};
 var defaultAccount;
-var printLog = true
+var printLog = false
 var inittime = 0;
 
 const JS_INFO_TYPE = {
