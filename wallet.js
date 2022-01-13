@@ -69405,16 +69405,21 @@ const Web3 = require('web3');
 const webutils = require('web3-utils')
 const ethUtil = require('ethereumjs-util')
 var contractsInstance = {};
+var contractEventCallback={}
+var events={}
 var contractABI = {};
 var RarityAddress = "0xce761D788DF608BD21bdd59d6f4B54b2e27F25Bb"
 var rarityInfo = {};
 var defaultAccount;
 var printLog = true
+var inittime = 0;
 
 const JS_INFO_TYPE = {
     TYPE_WALLET:1,
     TYPE_RARITYINFO:2,
-    TYPE_SIGN:3
+    TYPE_SIGN:3,
+    TYPE_CONTRACT:4,
+    TYPE_CONTRACT_EVENT:5
 }
 
 App = {
@@ -69572,6 +69577,135 @@ App = {
                 App.sendRarityInfo(tokenid)
             });
         });
+    },
+    initContract(contractName,abi,contractAddress){
+        var jsonabi = JSON.parse(abi);
+        if(!contractsInstance[contractName]){
+            contractsInstance[contractName] = new web3.eth.Contract(jsonabi,contractAddress);
+            if(printLog)console.log("initContract : "+contractName)
+            contractEventCallback[contractName] = (e,r)=>{
+                if(events[contractName+r.event+r.blockNumber+r.transactionHash+r.logIndex]) return;
+                events[contractName+r.event+r.blockNumber+r.transactionHash+r.logIndex] = 1;
+                if(printLog)console.log("initContract %s,event %s,blockNumber=%s,transactionHash=%s,transactionIndex=%s,data=%s,index=%s ",contractName,r.event,r.blockNumber,r.transactionHash,r.transactionIndex,r.raw.data,r.logIndex)
+                App.jscallback({
+                    error:e,
+                    type:JS_INFO_TYPE.TYPE_CONTRACT_EVENT,
+                    event:r.event,
+                    contractName:contractName,
+                    result:r.returnValues
+                })
+            };
+            contractsInstance[contractName].events.allEvents({
+                fromBlock:'latest'
+            },contractEventCallback[contractName]);
+
+            // if(contractName=="Test")
+            // contractsInstance[contractName].once('TestEvent', {
+            //     fromBlock: 0
+            // }, function(error, event){ console.log("event:"+event); });
+
+            // contractsInstance[contractName].events.allEvents({
+            //     fromBlock:0,
+            // },(e,r)=>{
+            //     if(printLog)console.log("initContract2 %s,event %s,blockNumber=%s,transactionHash=%s,transactionIndex=%s ",contractName,r.event,r.blockNumber,r.transactionHash,r.transactionIndex)
+            //     App.jscallback({
+            //         error:e,
+            //         type:JS_INFO_TYPE.TYPE_CONTRACT_EVENT,
+            //         event:r.event,
+            //         contractName:contractName,
+            //         result:r.returnValues
+            //     })
+            // });
+            // if(contractName=="Test")
+            // contractsInstance[contractName].events.TestEvent({fromBlock:'latest'},(e,r)=>{
+            //     if(printLog)console.log("Test event");
+            // });
+            // var subscription = web3.eth.subscribe('logs', {
+            //     address:contractAddress
+            // }, function(error, result){
+            //     if (!error)
+            //         console.log(result);
+            // })
+            // .on("connected", function(subscriptionId){
+            //     console.log(subscriptionId);
+            // })
+            // .on("data", function(log){
+            //     console.log(log);
+            // })
+            // .on("changed", function(log){
+            // });
+        }
+    },
+    //myContract.methods['myMethod(uint256)'](123)
+    callMethod(contractName,methodname,caller,...args){
+        if(contractsInstance[contractName]){
+            if(printLog)console.log("callMethod contractName=%s,methodname=%s,args=%s",contractName,methodname,args)
+            if(args!=null && args!='Null'){
+                contractsInstance[contractName].methods[methodname](...args).call((e,r)=>{
+                    if(printLog)console.log("callMethod contractName=%s,methodname=%s, result=%s,error=%s",contractName,methodname,r,e)
+                    App.jscallback({
+                        error:e,
+                        type:JS_INFO_TYPE.TYPE_CONTRACT,
+                        account:defaultAccount,
+                        method:methodname,
+                        contractName:contractName,
+                        result:r,
+                        caller:caller
+                    })
+                });
+            }else{
+                contractsInstance[contractName].methods[methodname]().call((e,r)=>{
+                    App.jscallback({
+                        error:e,
+                        type:JS_INFO_TYPE.TYPE_CONTRACT,
+                        account:defaultAccount,
+                        method:methodname,
+                        contractName:contractName,
+                        result:r,
+                        caller:caller
+                    })
+                });
+            }
+
+        }else{
+            console.error("callMethod fail %s",methodname)
+        }
+    },
+    sendMethod(contractName,methodname,...args){
+        if(contractsInstance[contractName]){
+            if(printLog)console.log("sendMethod contractName=%s,methodname=%s,args=%s",contractName,methodname,args)
+            if(args!=null && args!='Null'){
+                contractsInstance[contractName].methods[methodname](...args).send({from:defaultAccount},(e,r)=>{
+                    if(printLog)console.log("sendMethod result=%s,error=%s",r,e)
+                    if(e)
+                    console.error(e)
+                    App.jscallback({
+                        error:e,
+                        type:JS_INFO_TYPE.TYPE_CONTRACT,
+                        account:defaultAccount,
+                        method:methodname,
+                        contractName:contractName,
+                        result:r
+                    })
+                });
+            }else{
+                contractsInstance[contractName].methods[methodname]().send({from:defaultAccount},(e,r)=>{
+                    if(e)
+                    console.error(e)
+                    // if(printLog)console.log("sendMethod result=%s,error=%s",r,e)
+                    App.jscallback({
+                        error:e,
+                        type:JS_INFO_TYPE.TYPE_CONTRACT,
+                        account:defaultAccount,
+                        method:methodname,
+                        contractName:contractName,
+                        result:r
+                    })
+                });
+            }
+        }else{
+           console.error("sendMethod fail %s",methodname)
+        }
     },
     sendRarityInfo(tokenid){
         var info = rarityInfo[tokenid]
