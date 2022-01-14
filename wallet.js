@@ -69578,7 +69578,7 @@ App = {
             });
         });
     },
-    initContract(contractName,abi,contractAddress){
+    initContract(contractName,abi,contractAddress,listenEvent=1){
         var jsonabi = JSON.parse(abi);
         if(!contractsInstance[contractName]){
             contractsInstance[contractName] = new web3.eth.Contract(jsonabi,contractAddress);
@@ -69595,45 +69595,10 @@ App = {
                     result:r.returnValues
                 })
             };
+            if(listenEvent==1)
             contractsInstance[contractName].events.allEvents({
                 fromBlock:'latest'
             },contractEventCallback[contractName]);
-
-            // if(contractName=="Test")
-            // contractsInstance[contractName].once('TestEvent', {
-            //     fromBlock: 0
-            // }, function(error, event){ console.log("event:"+event); });
-
-            // contractsInstance[contractName].events.allEvents({
-            //     fromBlock:0,
-            // },(e,r)=>{
-            //     if(printLog)console.log("initContract2 %s,event %s,blockNumber=%s,transactionHash=%s,transactionIndex=%s ",contractName,r.event,r.blockNumber,r.transactionHash,r.transactionIndex)
-            //     App.jscallback({
-            //         error:e,
-            //         type:JS_INFO_TYPE.TYPE_CONTRACT_EVENT,
-            //         event:r.event,
-            //         contractName:contractName,
-            //         result:r.returnValues
-            //     })
-            // });
-            // if(contractName=="Test")
-            // contractsInstance[contractName].events.TestEvent({fromBlock:'latest'},(e,r)=>{
-            //     if(printLog)console.log("Test event");
-            // });
-            // var subscription = web3.eth.subscribe('logs', {
-            //     address:contractAddress
-            // }, function(error, result){
-            //     if (!error)
-            //         console.log(result);
-            // })
-            // .on("connected", function(subscriptionId){
-            //     console.log(subscriptionId);
-            // })
-            // .on("data", function(log){
-            //     console.log(log);
-            // })
-            // .on("changed", function(log){
-            // });
         }
     },
     //myContract.methods['myMethod(uint256)'](123)
