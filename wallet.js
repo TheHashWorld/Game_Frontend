@@ -74244,6 +74244,7 @@ const ethUtil = require('ethereumjs-util')
 const keccak256 = require("keccak256");
 const {MerkleTree} = require("merkletreejs");
 
+var contractAddress={}
 var contractsInstance = {};
 var contractEventCallback={}
 var events={}
@@ -74420,7 +74421,8 @@ App = {
     },
     initContract(contractName,abi,contractAddress,listenEvent=1){
         var jsonabi = JSON.parse(abi);
-        if(!contractsInstance[contractName]){
+        if(!contractAddress[contractAddress]){
+            contractAddress[contractAddress] = contractName
             contractsInstance[contractName] = new web3.eth.Contract(jsonabi,contractAddress);
             if(printLog)console.log("initContract : "+contractName)
             contractEventCallback[contractName] = (e,r)=>{
