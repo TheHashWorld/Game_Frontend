@@ -74546,6 +74546,42 @@ App = {
            console.error("sendMethod fail %s",methodname)
         }
     },
+    sendMethodWithGas(contractName,methodname,gas,...args){
+        if(contractsInstance[contractName]){
+            if(printLog)console.log("sendMethod contractName=%s,methodname=%s,args=%s",contractName,methodname,args)
+            if(args!=null && args!='Null'){
+                contractsInstance[contractName].methods[methodname](...args).send({from:defaultAccount,gas:gas},(e,r)=>{
+                    if(printLog)console.log("sendMethod result=%s,error=%s",r,e)
+                    if(e)
+                    console.error(e)
+                    App.jscallback({
+                        error:e,
+                        type:JS_INFO_TYPE.TYPE_CONTRACT,
+                        account:defaultAccount,
+                        method:methodname,
+                        contractName:contractName,
+                        result:r
+                    })
+                });
+            }else{
+                contractsInstance[contractName].methods[methodname]().send({from:defaultAccount,gas:gas},(e,r)=>{
+                    if(e)
+                    console.error(e)
+                    // if(printLog)console.log("sendMethod result=%s,error=%s",r,e)
+                    App.jscallback({
+                        error:e,
+                        type:JS_INFO_TYPE.TYPE_CONTRACT,
+                        account:defaultAccount,
+                        method:methodname,
+                        contractName:contractName,
+                        result:r
+                    })
+                });
+            }
+        }else{
+           console.error("sendMethod fail %s",methodname)
+        }
+    },
     sendRarityInfo(tokenid){
         var info = rarityInfo[tokenid]
 
